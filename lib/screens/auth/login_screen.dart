@@ -154,15 +154,19 @@ class _ParticleBgState extends State<ParticleBg>
       if (p.x < 0) p.x = 1.0;
       if (p.x > 1) p.x = 0.0;
     }
-    
+
   }
 
   @override
   void dispose() { _c.removeListener(_tick); _c.dispose(); super.dispose(); }
 
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(animation: _c, builder: (_, __) =>
-      CustomPaint(painter: _PtPainter(_pts), size: Size.infinite));
+  Widget build(BuildContext context) =>
+      AnimatedBuilder(
+        animation: _c,
+        builder: (_, __) =>
+            CustomPaint(painter: _PtPainter(_pts), size: Size.infinite),
+      );
 }
 
 class _PtPainter extends CustomPainter {
@@ -202,7 +206,7 @@ class FFTextField extends StatefulWidget {
 class _FFTFState extends State<FFTextField> {
   bool _show = false;
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(animation: _c, builder: (_, __) => TextFormField(
+  Widget build(BuildContext context) => TextFormField(
     controller: widget.controller,
     obscureText: widget.obscure && !_show,
     keyboardType: widget.keyboard,
@@ -731,7 +735,7 @@ class _Section extends StatelessWidget {
   final String label;
   const _Section({required this.label});
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(animation: _c, builder: (_, __) => Row(children: [
+  Widget build(BuildContext context) => Row(children: [
     Container(width: 3, height: 14,
         decoration: BoxDecoration(
             gradient: AppTheme.neonGradient,
