@@ -1,17 +1,22 @@
 workflows:
   android-release:
-    name: FF Pro Arena PK - Android APK
+    name: FF Pro Arena PK - Android Release
     max_build_duration: 60
     environment:
-      flutter: 3.19.0
+      flutter: 3.19.6
       java: 17
     scripts:
-      - name: Get packages
+      - name: Get Flutter packages
         script: flutter pub get
+
       - name: Build APK
-        script: flutter build apk --release --no-tree-shake-icons
+        script: |
+          flutter build apk --release \
+            --dart-define=FLUTTER_BUILD_MODE=release
+
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
+
     publishing:
       email:
         recipients:
