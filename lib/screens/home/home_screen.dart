@@ -295,7 +295,7 @@ class _TournamentCard extends StatelessWidget {
                 _InfoChip(Icons.map_outlined, tournament.map),
                 const SizedBox(width: 8),
                 _InfoChip(Icons.people_outline_rounded,
-                    '${tournament.gameMode}'),
+                    '${tournament.mode}'),
                 const SizedBox(width: 8),
                 _InfoChip(Icons.access_time_rounded,
                     fmt.format(tournament.scheduledAt)),

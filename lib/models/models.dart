@@ -1,12 +1,33 @@
-// lib/models/user_model.dart
-import 'package:cloud_firestore/cloud_firestore.dart';
+// lib/models/models.dart  –– Firebase Realtime Database version
+import 'package:firebase_database/firebase_database.dart';
 
+// ── Helper ─────────────────────────────────────────────────────────────────────
+DateTime _tsToDate(dynamic v) {
+  if (v == null) return DateTime.now();
+  if (v is int) return DateTime.fromMillisecondsSinceEpoch(v);
+  return DateTime.fromMillisecondsSinceEpoch((v as num).toInt());
+}
+
+DateTime? _tsToDateNullable(dynamic v) {
+  if (v == null) return null;
+  if (v is int) return DateTime.fromMillisecondsSinceEpoch(v);
+  return DateTime.fromMillisecondsSinceEpoch((v as num).toInt());
+}
+
+List<String> _mapToList(dynamic v) {
+  if (v == null) return [];
+  if (v is List) return List<String>.from(v);
+  if (v is Map) return v.values.map((e) => e.toString()).toList();
+  return [];
+}
+
+// ── UserModel ──────────────────────────────────────────────────────────────────
 class UserModel {
   final String uid;
   final String mobile;
   final String freeFireUid;
   final String displayName;
-  final String role; // user | vip | admin
+  final String role;
   final double walletBalance;
   final double winningBalance;
   final String? avatarUrl;
@@ -37,27 +58,27 @@ class UserModel {
   });
 
   bool get isAdmin => role == 'admin';
-  bool get isVip   => role == 'vip' || role == 'admin';
+  bool get isVip => role == 'vip' || role == 'admin';
   double get totalBalance => walletBalance + winningBalance;
 
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory UserModel.fromSnapshot(DataSnapshot snap) {
+    final d = Map<dynamic, dynamic>.from(snap.value as Map? ?? {});
     return UserModel(
-      uid: doc.id,
-      mobile: data['mobile'] ?? '',
-      freeFireUid: data['freeFireUid'] ?? '',
-      displayName: data['displayName'] ?? 'Player',
-      role: data['role'] ?? 'user',
-      walletBalance: (data['walletBalance'] ?? 0).toDouble(),
-      winningBalance: (data['winningBalance'] ?? 0).toDouble(),
-      avatarUrl: data['avatarUrl'],
-      isOnline: data['isOnline'] ?? false,
-      isBanned: data['isBanned'] ?? false,
-      isMuted: data['isMuted'] ?? false,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      lastSeen: (data['lastSeen'] as Timestamp?)?.toDate(),
-      joinedTournaments: List<String>.from(data['joinedTournaments'] ?? []),
-      fcmToken: data['fcmToken'],
+      uid: snap.key ?? '',
+      mobile: (d['mobile'] ?? '').toString(),
+      freeFireUid: (d['freeFireUid'] ?? '').toString(),
+      displayName: (d['displayName'] ?? 'Player').toString(),
+      role: (d['role'] ?? 'user').toString(),
+      walletBalance: (d['walletBalance'] ?? 0).toDouble(),
+      winningBalance: (d['winningBalance'] ?? 0).toDouble(),
+      avatarUrl: d['avatarUrl']?.toString(),
+      isOnline: d['isOnline'] ?? false,
+      isBanned: d['isBanned'] ?? false,
+      isMuted: d['isMuted'] ?? false,
+      createdAt: _tsToDate(d['createdAt']),
+      lastSeen: _tsToDateNullable(d['lastSeen']),
+      joinedTournaments: _mapToList(d['joinedTournaments']),
+      fcmToken: d['fcmToken']?.toString(),
     );
   }
 
@@ -72,17 +93,18 @@ class UserModel {
     'isOnline': isOnline,
     'isBanned': isBanned,
     'isMuted': isMuted,
-    'createdAt': Timestamp.fromDate(createdAt),
-    'lastSeen': lastSeen != null ? Timestamp.fromDate(lastSeen!) : null,
-    'joinedTournaments': joinedTournaments,
+    'createdAt': createdAt.millisecondsSinceEpoch,
+    'lastSeen': lastSeen?.millisecondsSinceEpoch,
+    'joinedTournaments': joinedTournaments.isEmpty
+        ? null
+        : {for (var t in joinedTournaments) t: true},
     'fcmToken': fcmToken,
   };
 
   UserModel copyWith({
     String? role, double? walletBalance, double? winningBalance,
     bool? isOnline, bool? isBanned, bool? isMuted,
-    String? avatarUrl, String? fcmToken,
-    List<String>? joinedTournaments,
+    String? avatarUrl, String? fcmToken, List<String>? joinedTournaments,
   }) => UserModel(
     uid: uid, mobile: mobile, freeFireUid: freeFireUid,
     displayName: displayName, createdAt: createdAt,
@@ -98,7 +120,7 @@ class UserModel {
   );
 }
 
-// ── Tournament Model ───────────────────────────────────────────────────────────
+// ── TournamentModel ────────────────────────────────────────────────────────────
 class TournamentModel {
   final String id;
   final String title;
@@ -108,7 +130,7 @@ class TournamentModel {
   final double prizePool;
   final int totalSlots;
   final int filledSlots;
-  final String status; // upcoming | live | ended
+  final String status;
   final DateTime scheduledAt;
   final String? bannerUrl;
   final String? roomId;
@@ -149,36 +171,38 @@ class TournamentModel {
 
   String get mapEmoji {
     switch (map) {
-      case 'Bermuda':   return '🏝️';
-      case 'Purgatory': return '🏔️';
-      case 'Kalahari':  return '🏜️';
-      case 'Alpine':    return '❄️';
-      case 'Neextarra': return '🌌';
-      default: return '🗺️';
+      case 'Bermuda':    return '🏝️';
+      case 'Purgatory':  return '🏔️';
+      case 'Kalahari':   return '🏜️';
+      case 'Alpine':     return '❄️';
+      case 'Neextarra':  return '🌌';
+      default:           return '🗺️';
     }
   }
 
-  factory TournamentModel.fromFirestore(DocumentSnapshot doc) {
-    final d = doc.data() as Map<String, dynamic>;
+  factory TournamentModel.fromSnapshot(DataSnapshot snap) {
+    final d = Map<dynamic, dynamic>.from(snap.value as Map? ?? {});
     return TournamentModel(
-      id: doc.id,
-      title: d['title'] ?? '',
-      map: d['map'] ?? 'Bermuda',
-      mode: d['mode'] ?? 'Squad',
+      id: snap.key ?? '',
+      title: (d['title'] ?? '').toString(),
+      map: (d['map'] ?? 'Bermuda').toString(),
+      mode: (d['mode'] ?? 'Squad').toString(),
       entryFee: (d['entryFee'] ?? 0).toDouble(),
       prizePool: (d['prizePool'] ?? 0).toDouble(),
-      totalSlots: d['totalSlots'] ?? 100,
-      filledSlots: d['filledSlots'] ?? 0,
-      status: d['status'] ?? 'upcoming',
-      scheduledAt: (d['scheduledAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      bannerUrl: d['bannerUrl'],
-      roomId: d['roomId'],
-      roomPassword: d['roomPassword'],
+      totalSlots: (d['totalSlots'] ?? 100) as int,
+      filledSlots: (d['filledSlots'] ?? 0) as int,
+      status: (d['status'] ?? 'upcoming').toString(),
+      scheduledAt: _tsToDate(d['scheduledAt']),
+      bannerUrl: d['bannerUrl']?.toString(),
+      roomId: d['roomId']?.toString(),
+      roomPassword: d['roomPassword']?.toString(),
       roomVisible: d['roomVisible'] ?? false,
-      joinedUsers: List<String>.from(d['joinedUsers'] ?? []),
-      prizeDistribution: Map<String, dynamic>.from(d['prizeDistribution'] ?? {}),
-      createdBy: d['createdBy'] ?? '',
-      createdAt: (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      joinedUsers: _mapToList(d['joinedUsers']),
+      prizeDistribution: d['prizeDistribution'] != null
+          ? Map<String, dynamic>.from(d['prizeDistribution'] as Map)
+          : {},
+      createdBy: (d['createdBy'] ?? '').toString(),
+      createdAt: _tsToDate(d['createdAt']),
     );
   }
 
@@ -187,17 +211,19 @@ class TournamentModel {
     'entryFee': entryFee, 'prizePool': prizePool,
     'totalSlots': totalSlots, 'filledSlots': filledSlots,
     'status': status,
-    'scheduledAt': Timestamp.fromDate(scheduledAt),
+    'scheduledAt': scheduledAt.millisecondsSinceEpoch,
     'bannerUrl': bannerUrl, 'roomId': roomId,
     'roomPassword': roomPassword, 'roomVisible': roomVisible,
-    'joinedUsers': joinedUsers,
+    'joinedUsers': joinedUsers.isEmpty
+        ? null
+        : {for (var u in joinedUsers) u: true},
     'prizeDistribution': prizeDistribution,
     'createdBy': createdBy,
-    'createdAt': Timestamp.fromDate(createdAt),
+    'createdAt': createdAt.millisecondsSinceEpoch,
   };
 }
 
-// ── Message Model ──────────────────────────────────────────────────────────────
+// ── MessageModel ───────────────────────────────────────────────────────────────
 enum MessageType { text, image, voice, system }
 
 class MessageModel {
@@ -230,26 +256,26 @@ class MessageModel {
   });
 
   bool get isAdmin => senderRole == 'admin';
-  bool get isVip   => senderRole == 'vip' || senderRole == 'admin';
+  bool get isVip => senderRole == 'vip' || senderRole == 'admin';
 
-  factory MessageModel.fromFirestore(DocumentSnapshot doc) {
-    final d = doc.data() as Map<String, dynamic>;
+  factory MessageModel.fromSnapshot(DataSnapshot snap) {
+    final d = Map<dynamic, dynamic>.from(snap.value as Map? ?? {});
     return MessageModel(
-      id: doc.id,
-      senderId: d['senderId'] ?? '',
-      senderName: d['senderName'] ?? 'Player',
-      senderRole: d['senderRole'] ?? 'user',
-      senderAvatar: d['senderAvatar'],
-      content: d['content'] ?? '',
+      id: snap.key ?? '',
+      senderId: (d['senderId'] ?? '').toString(),
+      senderName: (d['senderName'] ?? 'Player').toString(),
+      senderRole: (d['senderRole'] ?? 'user').toString(),
+      senderAvatar: d['senderAvatar']?.toString(),
+      content: (d['content'] ?? '').toString(),
       type: MessageType.values.firstWhere(
-        (e) => e.name == (d['type'] ?? 'text'),
+        (e) => e.name == (d['type'] ?? 'text').toString(),
         orElse: () => MessageType.text,
       ),
       isPinned: d['isPinned'] ?? false,
       isDeleted: d['isDeleted'] ?? false,
-      mediaUrl: d['mediaUrl'],
-      audioDurationSec: d['audioDurationSec'],
-      createdAt: (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      mediaUrl: d['mediaUrl']?.toString(),
+      audioDurationSec: d['audioDurationSec'] as int?,
+      createdAt: _tsToDate(d['createdAt']),
     );
   }
 
@@ -259,18 +285,18 @@ class MessageModel {
     'content': content, 'type': type.name,
     'isPinned': isPinned, 'isDeleted': isDeleted,
     'mediaUrl': mediaUrl, 'audioDurationSec': audioDurationSec,
-    'createdAt': Timestamp.fromDate(createdAt),
+    'createdAt': createdAt.millisecondsSinceEpoch,
   };
 }
 
-// ── Transaction Model ──────────────────────────────────────────────────────────
+// ── TransactionModel ───────────────────────────────────────────────────────────
 class TransactionModel {
   final String id;
   final String userId;
   final String userName;
-  final String type; // deposit | withdrawal | winning | bonus | deduction
+  final String type;
   final double amount;
-  final String status; // pending | approved | rejected
+  final String status;
   final String? transactionId;
   final String? screenshotUrl;
   final String? mobileWallet;
@@ -301,22 +327,22 @@ class TransactionModel {
   bool get isApproved   => status == 'approved';
   bool get isRejected   => status == 'rejected';
 
-  factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
-    final d = doc.data() as Map<String, dynamic>;
+  factory TransactionModel.fromSnapshot(DataSnapshot snap) {
+    final d = Map<dynamic, dynamic>.from(snap.value as Map? ?? {});
     return TransactionModel(
-      id: doc.id,
-      userId: d['userId'] ?? '',
-      userName: d['userName'] ?? '',
-      type: d['type'] ?? 'deposit',
+      id: snap.key ?? '',
+      userId: (d['userId'] ?? '').toString(),
+      userName: (d['userName'] ?? '').toString(),
+      type: (d['type'] ?? 'deposit').toString(),
       amount: (d['amount'] ?? 0).toDouble(),
-      status: d['status'] ?? 'pending',
-      transactionId: d['transactionId'],
-      screenshotUrl: d['screenshotUrl'],
-      mobileWallet: d['mobileWallet'],
-      mobileNumber: d['mobileNumber'],
-      adminNote: d['adminNote'],
-      createdAt: (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      processedAt: (d['processedAt'] as Timestamp?)?.toDate(),
+      status: (d['status'] ?? 'pending').toString(),
+      transactionId: d['transactionId']?.toString(),
+      screenshotUrl: d['screenshotUrl']?.toString(),
+      mobileWallet: d['mobileWallet']?.toString(),
+      mobileNumber: d['mobileNumber']?.toString(),
+      adminNote: d['adminNote']?.toString(),
+      createdAt: _tsToDate(d['createdAt']),
+      processedAt: _tsToDateNullable(d['processedAt']),
     );
   }
 
@@ -326,7 +352,7 @@ class TransactionModel {
     'transactionId': transactionId, 'screenshotUrl': screenshotUrl,
     'mobileWallet': mobileWallet, 'mobileNumber': mobileNumber,
     'adminNote': adminNote,
-    'createdAt': Timestamp.fromDate(createdAt),
-    'processedAt': processedAt != null ? Timestamp.fromDate(processedAt!) : null,
+    'createdAt': createdAt.millisecondsSinceEpoch,
+    'processedAt': processedAt?.millisecondsSinceEpoch,
   };
 }

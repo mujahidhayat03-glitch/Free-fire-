@@ -13,7 +13,7 @@ dependencies:
   # Firebase
   firebase_core: ^2.27.0
   firebase_auth: ^4.17.0
-  cloud_firestore: ^4.15.0
+  firebase_database: ^10.4.0
   firebase_storage: ^11.6.0
   firebase_messaging: ^14.7.20
 

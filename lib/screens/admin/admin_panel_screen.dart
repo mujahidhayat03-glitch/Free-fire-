@@ -211,7 +211,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
           ElevatedButton(
             onPressed: () async {
               if (ctrl.text.trim().isNotEmpty) {
-                await p.db.sendAnnouncement(ctrl.text.trim());
+                await p.db.sendBroadcast(ctrl.text.trim(), p.currentUser?.uid ?? 'admin');
               }
               if (ctx.mounted) Navigator.pop(ctx);
             },
@@ -403,7 +403,7 @@ class _TxnTile extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(txn.description, style: AppTheme.bodySmall.copyWith(
+          Text('${txn.type} · ${txn.mobileWallet ?? ''}', style: AppTheme.bodySmall.copyWith(
               color: AppTheme.textPrimary), maxLines: 1, overflow: TextOverflow.ellipsis),
           Text('PKR ${txn.amount.toStringAsFixed(0)}',
               style: AppTheme.neonLabel.copyWith(
@@ -411,7 +411,9 @@ class _TxnTile extends StatelessWidget {
         ])),
         Row(children: [
           GestureDetector(
-            onTap: () => provider.db.approveTransaction(txn.id),
+            onTap: () => txn.isDeposit
+                ? provider.db.approveDeposit(txn)
+                : provider.db.approveWithdrawal(txn.id),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
@@ -425,7 +427,7 @@ class _TxnTile extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           GestureDetector(
-            onTap: () => provider.db.rejectTransaction(txn.id),
+            onTap: () => provider.db.rejectDeposit(txn.id, ''),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(

@@ -21,6 +21,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '60867558562',
     projectId: 'ff-pro-arena-pk',
     storageBucket: 'ff-pro-arena-pk.firebasestorage.app',
+    databaseURL: 'https://ff-pro-arena-pk-default-rtdb.firebaseio.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
@@ -30,6 +31,7 @@ class DefaultFirebaseOptions {
     projectId: 'ff-pro-arena-pk',
     storageBucket: 'ff-pro-arena-pk.firebasestorage.app',
     iosBundleId: 'com.ffproarenapk.pk',
+    databaseURL: 'https://ff-pro-arena-pk-default-rtdb.firebaseio.com',
   );
 
   static const FirebaseOptions web = FirebaseOptions(
@@ -38,5 +40,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '60867558562',
     projectId: 'ff-pro-arena-pk',
     storageBucket: 'ff-pro-arena-pk.firebasestorage.app',
+    databaseURL: 'https://ff-pro-arena-pk-default-rtdb.firebaseio.com',
   );
 }
