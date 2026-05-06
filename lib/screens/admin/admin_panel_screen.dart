@@ -241,7 +241,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
             stream: p.db.tournamentsStream(),
             builder: (_, snap) {
               final tours = snap.data ?? [];
-              final revenue = tours.fold(0.0, (s, t) => s + t.entryFee * t.currentPlayers);
+              final revenue = tours.fold(0.0, (s, t) => s + t.entryFee * t.filledSlots);
               final prizes  = tours.fold(0.0, (s, t) => s + t.prizePool);
               return Column(children: [
                 _StatRow('Total Revenue', 'PKR ${revenue.toStringAsFixed(0)}', AppTheme.neonGreen),

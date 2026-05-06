@@ -65,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
       id: '', senderId: user.uid,
       senderName: user.displayName,
       senderRole: user.role,
-      text: text, type: 'text',
+      content: text, type: MessageType.text,
       createdAt: DateTime.now(),
     ));
     _scrollToBottom();
@@ -87,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
         id: '', senderId: user.uid,
         senderName: user.displayName,
         senderRole: user.role,
-        text: url, type: 'image',
+        content: url, type: MessageType.image,
         createdAt: DateTime.now(),
       ));
       _scrollToBottom();
@@ -224,7 +224,8 @@ class _OnlineBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<UserModel>>(
-      stream: provider.db.onlineUsersStream(),
+      stream: provider.db.allUsersStream().map(
+            (users) => users.where((u) => u.isOnline).toList()),
       builder: (_, snap) {
         final users = snap.data ?? [];
         if (users.isEmpty) return const SizedBox.shrink();

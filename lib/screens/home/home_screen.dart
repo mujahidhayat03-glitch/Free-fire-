@@ -217,7 +217,7 @@ class _TournamentCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isLive = tournament.status == AppConstants.tournamentLive;
     final fmt = DateFormat('dd MMM · hh:mm a');
-    final spotsLeft = tournament.maxPlayers - tournament.currentPlayers;
+    final spotsLeft = tournament.totalSlots - tournament.filledSlots;
     final isFull = spotsLeft <= 0;
 
     return GestureDetector(
@@ -314,7 +314,7 @@ class _TournamentCard extends StatelessWidget {
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('SPOTS LEFT',
                       style: AppTheme.caption.copyWith(letterSpacing: 1)),
-                  Text(isFull ? 'FULL' : '$spotsLeft / ${tournament.maxPlayers}',
+                  Text(isFull ? 'FULL' : '$spotsLeft / ${tournament.totalSlots}',
                       style: AppTheme.neonLabel.copyWith(
                           color: isFull ? AppTheme.danger : AppTheme.neonGreen)),
                 ])),
@@ -327,7 +327,7 @@ class _TournamentCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: tournament.currentPlayers / tournament.maxPlayers,
+                  value: tournament.filledSlots / tournament.totalSlots,
                   minHeight: 4,
                   backgroundColor: AppTheme.divider,
                   valueColor: AlwaysStoppedAnimation<Color>(
