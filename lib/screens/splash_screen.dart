@@ -57,8 +57,10 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 2800));
 
     // Poll until first auth state event has been processed
-    while (provider.isInitializing && mounted) {
+    int waited = 0;
+    while (provider.isInitializing && mounted && waited < 8000) {
       await Future.delayed(const Duration(milliseconds: 50));
+      waited += 50;
     }
 
     if (!mounted) return;
