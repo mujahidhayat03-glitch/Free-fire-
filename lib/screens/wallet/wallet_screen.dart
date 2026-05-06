@@ -1,3 +1,5 @@
+export '../splash_screen.dart' show NeonButton, CustomTextField;
+import 'package:google_fonts/google_fonts.dart';
 // lib/screens/wallet/wallet_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -546,6 +548,4 @@ class _SheetHandle extends StatelessWidget {
 }
 
 // re-exports
-export '../splash_screen.dart' show NeonButton, CustomTextField;
 // GoogleFonts import for balance card
-import 'package:google_fonts/google_fonts.dart';

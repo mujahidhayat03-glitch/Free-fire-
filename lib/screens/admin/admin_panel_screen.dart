@@ -94,7 +94,7 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                 stream: provider.db.tournamentsStream(),
                 builder: (_, tSnap) {
                   return StreamBuilder<List<UserModel>>(
-                    stream: provider.db.usersStream(),
+                    stream: provider.db.allUsersStream(),
                     builder: (_, uSnap) {
                       final tours = tSnap.data ?? [];
                       final users = uSnap.data ?? [];
