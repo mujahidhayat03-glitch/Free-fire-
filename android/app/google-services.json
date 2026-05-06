@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "60867558562",
+    "project_id": "ff-pro-arena-pk",
+    "storage_bucket": "ff-pro-arena-pk.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60867558562:android:0e58603b86e6e9319e6bfb",
+        "android_client_info": {
+          "package_name": "com.ffproarenapk.pk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-a09dHvbg6CcddPszXGWwbAfxBJw0CxA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

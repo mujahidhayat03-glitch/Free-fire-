@@ -1,0 +1,43 @@
+name: ff_pro_arena_pk
+description: FF Pro Arena PK - Free Fire Tournament Platform
+version: 2.0.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.0
+  cloud_firestore: ^4.15.0
+  firebase_storage: ^11.6.0
+  firebase_messaging: ^14.7.20
+
+  # State management
+  provider: ^6.1.2
+  get: ^4.6.6
+
+  # UI & Animations
+  animate_do: ^3.3.4
+  google_fonts: ^6.2.1
+  cached_network_image: ^3.3.1
+
+  # Utilities
+  image_picker: ^1.0.7
+  intl: ^0.19.0
+  timeago: ^3.6.1
+  uuid: ^4.4.0
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

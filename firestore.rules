@@ -1,0 +1,105 @@
+// firestore.rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────────────────────
+    function isAuth()  { return request.auth != null; }
+    function uid()     { return request.auth.uid; }
+    function isAdmin() {
+      return isAuth() &&
+        get(/databases/$(database)/documents/users/$(uid())).data.role == 'admin';
+    }
+    function isOwner(userId) { return isAuth() && uid() == userId; }
+    function notBanned() {
+      return !get(/databases/$(database)/documents/users/$(uid())).data.isBanned;
+    }
+
+    // ── Users ─────────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isAuth();
+
+      // Owner can update own non-sensitive fields only
+      allow update: if isOwner(userId) && notBanned() &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['role', 'walletBalance', 'winningBalance', 'isBanned', 'isMuted']);
+
+      // Admin can do anything
+      allow write: if isAdmin();
+
+      // Register (create new)
+      allow create: if isAuth() && isOwner(userId);
+    }
+
+    // ── Tournaments ───────────────────────────────────────────────────────────
+    match /tournaments/{tId} {
+      // Anyone authenticated can read
+      allow read: if isAuth();
+
+      // Only admin can create/update/delete
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() ||
+        // Users can join (increment filledSlots, add to joinedUsers)
+        (isAuth() && notBanned() &&
+         request.resource.data.diff(resource.data).affectedKeys()
+           .hasOnly(['filledSlots', 'joinedUsers']));
+    }
+
+    // ── Chat Messages ─────────────────────────────────────────────────────────
+    match /messages/{msgId} {
+      allow read: if isAuth();
+
+      allow create: if isAuth() && notBanned() &&
+        request.resource.data.senderId == uid() &&
+        request.resource.data.content.size() < 1000;
+
+      // Only admin can delete/pin
+      allow update: if isAdmin() ||
+        // User can only mark their own as deleted
+        (isOwner(resource.data.senderId) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isDeleted']));
+    }
+
+    // ── Transactions ──────────────────────────────────────────────────────────
+    match /transactions/{txId} {
+      // User sees only their own; admin sees all
+      allow read: if isAdmin() || (isAuth() && resource.data.userId == uid());
+
+      // User can create deposit/withdrawal requests
+      allow create: if isAuth() && notBanned() &&
+        request.resource.data.userId == uid() &&
+        request.resource.data.status == 'pending' &&
+        request.resource.data.type in ['deposit', 'withdrawal'];
+
+      // Only admin can approve/reject
+      allow update: if isAdmin();
+    }
+
+    // ── Notifications ─────────────────────────────────────────────────────────
+    match /notifications/{nId} {
+      allow read: if isAdmin();
+      allow write: if isAuth();
+    }
+
+    // ── Typing indicators ─────────────────────────────────────────────────────
+    match /typing/{userId} {
+      allow read, write: if isAuth() && uid() == userId;
+      allow read: if isAuth(); // others can read to show typing status
+    }
+
+    // ── Login animations ──────────────────────────────────────────────────────
+    match /animations/{animId} {
+      allow read: if isAuth();
+      allow write: if isAdmin() ||
+        // VIP can trigger on login
+        (isAuth() &&
+         get(/databases/$(database)/documents/users/$(uid())).data.role in ['vip', 'admin']);
+    }
+
+    // ── Broadcasts ───────────────────────────────────────────────────────────
+    match /broadcasts/{bId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+  }
+}
