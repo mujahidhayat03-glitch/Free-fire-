@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 2800));
     if (!mounted) return;
     final provider = context.read<AppProvider>();
-    await provider.init();
+    provider.init();
     if (!mounted) return;
     Navigator.pushReplacement(context, _FadeRoute(
       builder: (_) =>
