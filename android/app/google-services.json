@@ -1,13 +1,14 @@
 {
   "project_info": {
     "project_number": "60867558562",
+    "firebase_url": "https://ff-pro-arena-pk-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "ff-pro-arena-pk",
     "storage_bucket": "ff-pro-arena-pk.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:60867558562:android:0e58603b86e6e9319e6bfb",
+        "mobilesdk_app_id": "1:60867558562:android:4259277888bcbe419e6bfb",
         "android_client_info": {
           "package_name": "com.ffproarenapk.pk"
         }

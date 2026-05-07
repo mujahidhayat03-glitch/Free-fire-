@@ -109,7 +109,7 @@ class _CreateTournamentScreenState extends State<CreateTournamentScreen> {
         status: widget.existing?.status ?? 'upcoming',
         scheduledAt: _scheduledAt,
         prizeDistribution: prizeDistribution,
-        createdBy: provider.currentUser!.uid,
+        createdBy: provider.currentUser?.uid ?? "",
         createdAt: widget.existing?.createdAt ?? DateTime.now(),
       );
 
