@@ -8,6 +8,7 @@ import '../../models/models.dart';
 import 'create_tournament_screen.dart';
 import 'manage_users_screen.dart';
 import 'payment_settings_screen.dart';
+import 'payment_settings_screen.dart';
 
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({super.key});
@@ -141,7 +142,6 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       color: AppTheme.accentPurple,
                       onTap: () => Navigator.push(context,
                           MaterialPageRoute(builder: (_) => const ManageUsersScreen())),
-                    )),
                   FadeInLeft(delay: const Duration(milliseconds: 200),
                     child: _ActionCard(
                       icon: Icons.account_balance_wallet_rounded,
@@ -150,6 +150,14 @@ class _AdminPanelScreenState extends State<AdminPanelScreen> {
                       color: AppTheme.gold,
                       onTap: () => _showWalletRequests(context, provider),
                     )),
+                  const SizedBox(height: 12),
+                  _ActionCard(
+                    icon: Icons.payment_rounded,
+                    title: 'Payment Settings',
+                    subtitle: 'JazzCash & Easypaisa number set karo',
+                    color: Colors.orange,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentSettingsScreen())),
+                  ),
                   FadeInLeft(delay: const Duration(milliseconds: 250),
                     child: _ActionCard(
                       icon: Icons.notifications_rounded,
