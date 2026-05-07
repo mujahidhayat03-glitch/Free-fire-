@@ -12,10 +12,9 @@ import 'utils/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ✅ FIX: Catch Flutter framework errors (release mode shows black screen)
-  FlutterError.onError = (FlutterErrorDetails details) {
+  // Catch all Flutter errors — no more black screen on crash
+  FlutterError.onError = (details) {
     FlutterError.presentError(details);
-    debugPrint('FlutterError: ${details.exception}');
   };
 
   await SystemChrome.setPreferredOrientations([
@@ -34,8 +33,7 @@ void main() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
-    debugPrint('Firebase init error: $e');
-    rethrow;
+    debugPrint('Firebase init failed: $e');
   }
 
   runApp(
@@ -53,32 +51,23 @@ class FFProArenaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ErrorWidget.builder = (details) => Scaffold(
+      backgroundColor: AppTheme.background,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Error: ${details.exception}',
+            style: const TextStyle(color: Colors.redAccent),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
     return GetMaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.theme,
-      // ✅ FIX: Show error message instead of black screen on crash
-      builder: (context, child) {
-        ErrorWidget.builder = (FlutterErrorDetails details) {
-          return Scaffold(
-            backgroundColor: AppTheme.background,
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.error_outline,
-                      color: Colors.redAccent, size: 48),
-                  const SizedBox(height: 16),
-                  Text('Error: ${details.exception}',
-                      style: const TextStyle(color: Colors.white70),
-                      textAlign: TextAlign.center),
-                ]),
-              ),
-            ),
-          );
-        };
-        return child ?? const SizedBox.shrink();
-      },
       home: const SplashScreen(),
     );
   }
