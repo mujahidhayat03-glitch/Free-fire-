@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/models.dart';
 import '../../providers/app_provider.dart';
 import '../../utils/app_theme.dart';
+import 'users_list_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});

@@ -538,3 +538,7 @@ class FirestoreService {
     });
   }
 }
+
+  Future<void> updateUserAvatar(String uid, String url) async {
+    await _ref("${AppConstants.usersCol}/$uid").update({"avatarUrl": url});
+  }
