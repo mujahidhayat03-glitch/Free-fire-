@@ -9,7 +9,6 @@ import 'chat/chat_screen.dart';
 import 'wallet/wallet_screen.dart';
 import 'profile/profile_screen.dart';
 import 'admin/admin_panel_screen.dart';
-import '../widgets/vip_entry_overlay.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -44,7 +43,7 @@ class _MainShellState extends State<MainShell> {
     final user = context.watch<AppProvider>().currentUser;
     final isAdmin = user?.role == AppConstants.roleAdmin;
 
-    return VipEntryOverlay(child: Scaffold(
+    return Scaffold(
       body: IndexedStack(index: _idx, children: _screens),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -76,7 +75,6 @@ class _MainShellState extends State<MainShell> {
         ),
       ),
     );
-  }));
   }
 }
 
@@ -122,6 +120,5 @@ class _NavBtn extends StatelessWidget {
         ]),
       ),
     );
-  }));
   }
 }
