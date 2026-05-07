@@ -551,7 +551,7 @@ class _LoginScreenState extends State<LoginScreen>
                       child: Row(children: [
                         const Icon(Icons.security, color: AppTheme.neonGreen, size: 12),
                         const SizedBox(width: 4),
-                        Text('POWERED BY FIREBASE',
+                        Text('POWERED BY MJ',
                             style: AppTheme.caption.copyWith(
                                 color: AppTheme.neonGreen, letterSpacing: 1.2)),
                       ]),
