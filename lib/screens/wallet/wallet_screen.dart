@@ -70,8 +70,7 @@ class WalletScreen extends StatelessWidget {
                     ]),
                     const SizedBox(height: 12),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                      _PaymentMethod('Easypaisa', '0300-0000000', Colors.green),
-                      _PaymentMethod('JazzCash',  '0300-0000000', Colors.red),
+                      StreamBuilder<Map<String, String>>(stream: context.read<AppProvider>().db.paymentNumbersStream(), builder: (_, snap) { final n = snap.data ?? {}; return Column(children: [_PaymentMethod('Easypaisa', n['easyPaisa'] ?? '...', Colors.green), _PaymentMethod('JazzCash', n['jazzCash'] ?? '...', Colors.red)]); }),
                     ]),
                   ]),
                 ),

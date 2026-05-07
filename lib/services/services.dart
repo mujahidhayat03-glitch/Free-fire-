@@ -511,3 +511,30 @@ class FirestoreService {
     });
   }
 }
+
+  // ══════════════════ PAYMENT SETTINGS ══════════════════════════════════════
+
+  Future<void> savePaymentNumbers({
+    required String jazzCash,
+    required String easyPaisa,
+  }) async {
+    await _ref('settings/payment').update({
+      'jazzCash':  jazzCash.trim(),
+      'easyPaisa': easyPaisa.trim(),
+      'updatedAt': ServerValue.timestamp,
+    });
+  }
+
+  Stream<Map<String, String>> paymentNumbersStream() {
+    return _ref('settings/payment').onValue.map((event) {
+      final snap = event.snapshot;
+      if (!snap.exists || snap.value == null) {
+        return {'jazzCash': '0300-0000000', 'easyPaisa': '0300-0000000'};
+      }
+      final m = Map<String, dynamic>.from(snap.value as Map);
+      return {
+        'jazzCash':  m['jazzCash']?.toString()  ?? '0300-0000000',
+        'easyPaisa': m['easyPaisa']?.toString() ?? '0300-0000000',
+      };
+    });
+  }

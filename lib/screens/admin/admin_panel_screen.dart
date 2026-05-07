@@ -7,6 +7,7 @@ import '../../utils/app_theme.dart';
 import '../../models/models.dart';
 import 'create_tournament_screen.dart';
 import 'manage_users_screen.dart';
+import 'payment_settings_screen.dart';
 
 class AdminPanelScreen extends StatefulWidget {
   const AdminPanelScreen({super.key});
