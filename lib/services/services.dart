@@ -510,7 +510,6 @@ class FirestoreService {
       return d;
     });
   }
-}
 
   // ══════════════════ PAYMENT SETTINGS ══════════════════════════════════════
 
@@ -518,7 +517,7 @@ class FirestoreService {
     required String jazzCash,
     required String easyPaisa,
   }) async {
-    await _ref('settings/payment').update({
+    await _rtdb.ref('settings/payment').update({
       'jazzCash':  jazzCash.trim(),
       'easyPaisa': easyPaisa.trim(),
       'updatedAt': ServerValue.timestamp,
@@ -526,7 +525,7 @@ class FirestoreService {
   }
 
   Stream<Map<String, String>> paymentNumbersStream() {
-    return _ref('settings/payment').onValue.map((event) {
+    return _rtdb.ref('settings/payment').onValue.map((event) {
       final snap = event.snapshot;
       if (!snap.exists || snap.value == null) {
         return {'jazzCash': '0300-0000000', 'easyPaisa': '0300-0000000'};
@@ -538,3 +537,4 @@ class FirestoreService {
       };
     });
   }
+}
